@@ -2,11 +2,11 @@ package etf.santorini.pd150258d;
 
 public class Koordinate {
 
-	private int red,kolona;
-	
+	private int red, kolona;
+
 	public Koordinate(int r, int k) {
-		red=r;
-		kolona=k;
+		red = r;
+		kolona = k;
 	}
 
 	public int getRed() {

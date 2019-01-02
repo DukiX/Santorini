@@ -5,11 +5,10 @@ public class Figura {
 	String oznaka;
 	private Koordinate koord;
 	private int trenutnaVisina = 0;
-	
-	
-	public Figura(Koordinate k,String ozn) {
-		koord=k;
-		oznaka=ozn;
+
+	public Figura(Koordinate k, String ozn) {
+		koord = k;
+		oznaka = ozn;
 	}
 
 	public String getOznaka() {
