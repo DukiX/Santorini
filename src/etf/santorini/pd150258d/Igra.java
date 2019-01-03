@@ -2,9 +2,7 @@ package etf.santorini.pd150258d;
 
 import java.awt.*;
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 
 public class Igra extends Thread {
 
@@ -12,6 +10,9 @@ public class Igra extends Thread {
 	private static int tekIgrac;
 	private Tabla tabla;
 	private Label oznStanje;
+	public static Label metrika = new Label();
+	private Font font = new Font(null, Font.BOLD, 20);
+	
 
 	public Igra(Tabla tbl, Igrac prvi, Igrac drugi, Label sta) {
 		igraci[0] = prvi;
@@ -21,9 +22,10 @@ public class Igra extends Thread {
 		tekIgrac = 0;
 		oznStanje = sta;
 		oznStanje.setText("");
-		ucitanoIzFajla = false;
 		ucitaneFigurePrvog = false;
 		ucitaneFigureDrugog = false;
+		metrika.setText("");
+		metrika.setFont(font);
 		// start();
 	}
 
@@ -221,16 +223,16 @@ public class Igra extends Thread {
 									1 - trenutniIgrac);
 
 							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
-								System.out.println("1Najbolja:" + najboljaVrednost);
+								//System.out.println("1Najbolja:" + najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								System.out.println("2Najbolja:" + najboljaVrednost);
+								//System.out.println("2Najbolja:" + najboljaVrednost);
 
 								if (trenutnaDubina == 0) {
 									staraPozicija = trenFig[f].getKoord();
 
 									odlukaPomeranje = novoPostavljeno;
-									System.out.println(
-											odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									//System.out.println(
+											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
 									odlukaGradnja = novoIzgrLok;
 								}
 							}
@@ -316,7 +318,6 @@ public class Igra extends Thread {
 		notify();
 	}
 
-	private boolean ucitanoIzFajla = false;
 	private boolean ucitaneFigurePrvog = false;
 	private boolean ucitaneFigureDrugog = false;
 
@@ -345,7 +346,6 @@ public class Igra extends Thread {
 	}
 
 	public void ucitajIzFajla() throws InterruptedException {
-		ucitanoIzFajla = true;
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("ulaz.txt"));
 			String line = reader.readLine();
@@ -439,7 +439,6 @@ public class Igra extends Thread {
 			reader.close();
 		} catch (Exception e) {
 			oznStanje.setText("Greska pri ucitavanju iz fajla");
-			ucitanoIzFajla = false;
 			ucitaneFigurePrvog = false;
 			ucitaneFigureDrugog = false;
 			e.printStackTrace();
@@ -476,11 +475,15 @@ public class Igra extends Thread {
 					break;
 				oznStanje.setText("Gradnja: igrac " + tekIgrac);
 
-				if (Santorini.rezimKorakPoKorak) {
+				/*if (Santorini.rezimKorakPoKorak) {
+					
 					stani();
-				}
+				}*/
 
 				igraci[tekIgrac].drugiDeoPoteza();
+				
+				metrika.setText(Integer.toString(Igrac.minMaxVr));
+				
 				tekIgrac = 1 - tekIgrac;
 			}
 			oznStanje.setText("Pobednik je " + stanje);
@@ -643,9 +646,9 @@ public class Igra extends Thread {
 									1 - trenutniIgrac, alfaLok, betaLok);
 
 							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
-								System.out.println("1Najbolja:" + najboljaVrednost);
+								//System.out.println("1Najbolja:" + najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								System.out.println("2Najbolja:" + najboljaVrednost);
+								//System.out.println("2Najbolja:" + najboljaVrednost);
 
 								if (najboljaVrednost >= betaLok) {
 									return najboljaVrednost;
@@ -657,8 +660,216 @@ public class Igra extends Thread {
 									staraPozicija = trenFig[f].getKoord();
 
 									odlukaPomeranje = novoPostavljeno;
-									System.out.println(
-											odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									//System.out.println(
+											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									odlukaGradnja = novoIzgrLok;
+								}
+							}
+							if (trenutniIgrac == 0 && trenutnaVrednost < najboljaVrednost) {
+								najboljaVrednost = trenutnaVrednost;
+
+								if (najboljaVrednost <= alfaLok) {
+									return najboljaVrednost;
+								}
+
+								betaLok = Math.min(betaLok, najboljaVrednost);
+
+								// odlukaPomeranje = novoPostavljeno;
+								// odlukaGradnja = novoIzgradjeno;
+								// staraPozicija = trenFig[f].getKoord();
+							}
+						}
+					}
+				}
+			}
+		}
+		return najboljaVrednost;
+	}
+	
+	private static int statickaFunkcijaNapredna(Tabla t, Figura[] moje, Figura[] tudje) throws Greska {
+		int f;
+		int m = privremenoPomerenaFigura.getTrenutnaVisina();
+		int l;
+		if (t.oznaka(novoIzgradjeno.getRed(), novoIzgradjeno.getKolona()).equals("K")) {
+			l = 3;
+		} else {
+			l = Integer.parseInt(t.oznaka(novoIzgradjeno.getRed(), novoIzgradjeno.getKolona())) - 1;
+		}
+		int rastojanjeMojih = Math.abs(moje[0].getKoord().getRed() - novoIzgradjeno.getRed())
+				+ Math.abs(moje[0].getKoord().getKolona() - novoIzgradjeno.getKolona())
+				+ Math.abs(moje[1].getKoord().getRed() - novoIzgradjeno.getRed())
+				+ Math.abs(moje[1].getKoord().getKolona() - novoIzgradjeno.getKolona());
+		int rastojanjeTudjih = Math.abs(tudje[0].getKoord().getRed() - novoIzgradjeno.getRed())
+				+ Math.abs(tudje[0].getKoord().getKolona() - novoIzgradjeno.getKolona())
+				+ Math.abs(tudje[1].getKoord().getRed() - novoIzgradjeno.getRed())
+				+ Math.abs(tudje[1].getKoord().getKolona() - novoIzgradjeno.getKolona());
+		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
+		l = l * razlika;
+		f = m + l;
+		return f;
+	}
+	
+	public static int minimaxNapredni(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
+			int trenutniIgrac, int alfa, int beta) throws Greska {
+		int najboljaVrednost, trenutnaVrednost;
+
+		Koordinate novoPostavljeno;
+		Koordinate novoIzgrLok;
+
+		int donja, gornja;
+
+		int alfaLok = alfa;
+		int betaLok = beta;
+
+		if (trenutniIgrac == 1) {
+			najboljaVrednost = -100000;
+			donja = 0;
+			gornja = 2;
+
+			if (trenutnaDubina == maxDubina) {
+				Figura[] temp1 = new Figura[2];
+				Figura[] temp2 = new Figura[2];
+				temp1[0] = trenFig[0];
+				temp1[1] = trenFig[1];
+				temp2[0] = trenFig[2];
+				temp2[1] = trenFig[3];
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
+			}
+
+			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
+					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
+				Figura[] temp1 = new Figura[2];
+				Figura[] temp2 = new Figura[2];
+				temp1[0] = trenFig[0];
+				temp1[1] = trenFig[1];
+				temp2[0] = trenFig[2];
+				temp2[1] = trenFig[3];
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
+			}
+
+		} else {
+			najboljaVrednost = 100000;
+			donja = 2;
+			gornja = 4;
+
+			if (trenutnaDubina == maxDubina) {
+				Figura[] temp1 = new Figura[2];
+				Figura[] temp2 = new Figura[2];
+				temp1[0] = trenFig[2];
+				temp1[1] = trenFig[3];
+				temp2[0] = trenFig[0];
+				temp2[1] = trenFig[1];
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
+			}
+
+			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
+					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
+				Figura[] temp1 = new Figura[2];
+				Figura[] temp2 = new Figura[2];
+				temp1[0] = trenFig[2];
+				temp1[1] = trenFig[3];
+				temp2[0] = trenFig[0];
+				temp2[1] = trenFig[1];
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
+			}
+		}
+
+		for (int f = donja; f < gornja; f++) {
+
+			// System.out.println(trenFig[f].getKoord().getRed()+"
+			// "+trenFig[f].getKoord().getKolona()+" "+f);
+
+			for (int i = trenFig[f].getKoord().getRed() - 1; i <= trenFig[f].getKoord().getRed() + 1; i++) {
+				for (int j = trenFig[f].getKoord().getKolona() - 1; j <= trenFig[f].getKoord().getKolona() + 1; j++) {
+
+					if (i < 0 || i > 4 || j < 0 || j > 4) {
+						continue;
+					}
+					if (i == trenFig[f].getKoord().getRed() && j == trenFig[f].getKoord().getKolona()) {
+						continue;
+					}
+					if (!trenutnoStanje.oznaka(i, j).equals("0") && !trenutnoStanje.oznaka(i, j).equals("1")
+							&& !trenutnoStanje.oznaka(i, j).equals("2") && !trenutnoStanje.oznaka(i, j).equals("3")) {
+						continue;
+					}
+
+					if (!(trenutnoStanje.oznaka(i, j).equals("0") || trenutnoStanje.oznaka(i, j).equals("1")
+							|| (trenutnoStanje.oznaka(i, j).equals("2") && trenFig[f].getTrenutnaVisina() >= 1)
+							|| (trenutnoStanje.oznaka(i, j).equals("3") && trenFig[f].getTrenutnaVisina() >= 2))) {
+						continue;
+					}
+
+					Tabla novoStanje = trenutnoStanje.nova();
+
+					Figura[] figureLok = new Figura[4];
+
+					for (int z = 0; z < 4; z++) {
+						figureLok[z] = new Figura(
+								new Koordinate(trenFig[z].getKoord().getRed(), trenFig[z].getKoord().getKolona()),
+								trenFig[z].getOznaka());
+						figureLok[z].setTrenutnaVisina(trenFig[z].getTrenutnaVisina());
+					}
+
+					novoStanje.postaviOznaku(figureLok[f].getKoord().getRed(), figureLok[f].getKoord().getKolona(),
+							Integer.toString(figureLok[f].getTrenutnaVisina()));
+					figureLok[f].setKoord(novoStanje.uzmiKoordinate(i, j));
+					figureLok[f].setTrenutnaVisina(Integer.parseInt(novoStanje.oznaka(
+							novoStanje.uzmiKoordinate(i, j).getRed(), novoStanje.uzmiKoordinate(i, j).getKolona())));
+					novoStanje.postaviOznaku(novoStanje.uzmiKoordinate(i, j).getRed(),
+							novoStanje.uzmiKoordinate(i, j).getKolona(),
+							figureLok[f].getOznaka() + ", Vis: " + figureLok[f].getTrenutnaVisina());
+
+					novoPostavljeno = figureLok[f].getKoord();
+					privremenoPomerenaFigura = figureLok[f];
+
+					for (int m = figureLok[f].getKoord().getRed() - 1; m <= figureLok[f].getKoord().getRed() + 1; m++) {
+						for (int n = figureLok[f].getKoord().getKolona() - 1; n <= figureLok[f].getKoord().getKolona()
+								+ 1; n++) {
+							if (m < 0 || m > 4 || n < 0 || n > 4) {
+								continue;
+							}
+							if (m == figureLok[f].getKoord().getRed() && n == figureLok[f].getKoord().getKolona()) {
+								continue;
+							}
+							if (!dozvoljenoZaGradnju(novoStanje, novoStanje.uzmiKoordinate(m, n))) {
+								continue;
+							}
+
+							int staraVisina = Integer
+									.parseInt(novoStanje.oznaka(novoStanje.uzmiKoordinate(m, n).getRed(),
+											novoStanje.uzmiKoordinate(m, n).getKolona()));
+							if (staraVisina == 3) {
+								novoStanje.postaviOznaku(novoStanje.uzmiKoordinate(m, n).getRed(),
+										novoStanje.uzmiKoordinate(m, n).getKolona(), "K");
+							} else {
+								int novaVisina = staraVisina + 1;
+								novoStanje.postaviOznaku(novoStanje.uzmiKoordinate(m, n).getRed(),
+										novoStanje.uzmiKoordinate(m, n).getKolona(), Integer.toString(novaVisina));
+							}
+
+							novoIzgradjeno = novoStanje.uzmiKoordinate(m, n);
+							novoIzgrLok = novoIzgradjeno;
+
+							trenutnaVrednost = minimaxNapredni(novoStanje, figureLok, maxDubina, trenutnaDubina + 1,
+									1 - trenutniIgrac, alfaLok, betaLok);
+
+							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
+								//System.out.println("1Najbolja:" + najboljaVrednost);
+								najboljaVrednost = trenutnaVrednost;
+								//System.out.println("2Najbolja:" + najboljaVrednost);
+
+								if (najboljaVrednost >= betaLok) {
+									return najboljaVrednost;
+								}
+
+								alfaLok = Math.max(alfaLok, najboljaVrednost);
+
+								if (trenutnaDubina == 0) {
+									staraPozicija = trenFig[f].getKoord();
+
+									odlukaPomeranje = novoPostavljeno;
+									//System.out.println(
+											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
 									odlukaGradnja = novoIzgrLok;
 								}
 							}

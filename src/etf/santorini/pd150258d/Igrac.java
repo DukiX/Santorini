@@ -9,6 +9,7 @@ public abstract class Igrac {
 	protected Tabla tabla;
 	protected Figura[] figure = new Figura[2];
 	Figura izabranaFigura;
+	public static int minMaxVr=0;
 	
 	public String getOznaka() {
 		return oznaka;
