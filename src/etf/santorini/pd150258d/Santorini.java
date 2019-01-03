@@ -10,6 +10,10 @@ public class Santorini extends Frame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private Font font = new Font(null, Font.BOLD, 20);
+	
+	public static int DUBINA = 3;
+	private int racunara;
+	public static boolean rezimKorakPoKorak;
 
 	private class IgracPanel extends Panel {
 
@@ -17,10 +21,11 @@ public class Santorini extends Frame {
 		private CheckboxGroup grupa = new CheckboxGroup();
 		private Checkbox izborCovek = new Checkbox("Covek", true, grupa);
 		private Checkbox izborRacunar = new Checkbox("Racunar", false, grupa);
+		private Checkbox izborRacunarAlfaBeta = new Checkbox("RacunarAlfaBeta", false, grupa);
 
 		private String oznaka;
 		private Igrac igrac;
-
+		
 		IgracPanel(String ozn) {
 			oznaka = ozn;
 			Label ntp = new Label(ozn, Label.CENTER);
@@ -31,18 +36,36 @@ public class Santorini extends Frame {
 				public void itemStateChanged(ItemEvent e) {
 					if ((Checkbox) e.getSource() == izborCovek) {
 						igrac = new Covek(oznaka, tabla);
-					} else {
+						racunara--;
+					}else if((Checkbox) e.getSource() == izborRacunarAlfaBeta){
+						igrac = new RacunarAlfaBeta(oznaka, tabla); // racunar treba
+						racunara++;
+					}else {
 						igrac = new Racunar(oznaka, tabla); // racunar treba
+						racunara++;
 					}
+					if(racunara==2){
+						korakpokorak.setEnabled(true);
+					}else{
+						korakpokorak.setState(false);
+						korakpokorak.setEnabled(false);
+						slkorak.setEnabled(false);
+						rezimKorakPoKorak=false;
+					}
+					if (igra != null)
+						igra.prekini();
+					igra = new Igra(tabla, prvi.igrac, drugi.igrac, stanje);
 				}
 			};
 
 			izborCovek.addItemListener(osluskivac);
 			izborRacunar.addItemListener(osluskivac);
-			setLayout(new GridLayout(3, 1));
+			izborRacunarAlfaBeta.addItemListener(osluskivac);
+			setLayout(new GridLayout(4, 1));
 			add(ntp);
 			add(izborCovek);
 			add(izborRacunar);
+			add(izborRacunarAlfaBeta);
 			igrac = new Covek(oznaka, tabla);
 		}
 
@@ -54,7 +77,7 @@ public class Santorini extends Frame {
 	private IgracPanel drugi = new IgracPanel("P1");
 	private Igra igra;
 	private Label stanje = new Label("", Label.CENTER);
-
+	
 	public void popuniProzor() {
 		add(ploca, "Center");
 		add(prvi, "West");
@@ -70,15 +93,146 @@ public class Santorini extends Frame {
 				igra = new Igra(tabla, prvi.igrac, drugi.igrac, stanje);
 			}
 		});
-		add(dugme, "South");
+		Button reset = new Button("Start");
+		reset.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//if (igra != null)
+					//igra.prekini();
+				igra.start();
+			}
+		});
+		Panel p = new Panel();
+		p.setLayout(new GridLayout(1, 2));
+		korakpokorak =new Checkbox("Korak po korak");
+		korakpokorak.setEnabled(false);
+		korakpokorak.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED){
+					slkorak.setEnabled(true);
+					rezimKorakPoKorak=true;
+				}
+				if(e.getStateChange() == ItemEvent.DESELECTED){
+					slkorak.setEnabled(false);
+					rezimKorakPoKorak=false;
+				}
+			}
+		});
+		p.add(korakpokorak);
+		slkorak = new Button("Sledeci korak");
+		slkorak.setEnabled(false);
+		slkorak.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				igra.poteraj();
+			}
+		});
+		p.add(slkorak);
+		Panel plo = new Panel();
+		plo.setLayout(new GridLayout(2, 1));
+		plo.add(p);
+		Panel pl = new Panel();
+		pl.setLayout(new GridLayout(2, 1));
+		pl.add(dugme);
+		pl.add(reset);
+		plo.add(pl);
+		add(plo, "South");
 		stanje.setFont(font);
 		add(stanje, "North");
 	}
 
+	private Checkbox korakpokorak;
+	private Button slkorak;
+	
+	private void dodajMeni(){
+		MenuBar traka = new MenuBar();
+		setMenuBar(traka);
+		Menu meni = new Menu("Dubina pretrage");
+		traka.add(meni);
+		MenuItem stavka = new MenuItem("1");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DUBINA = Integer.parseInt(((MenuItem)e.getSource()).getLabel());
+			}
+		});
+		meni.add(stavka);
+		meni.addSeparator();
+		
+		stavka = new MenuItem("2");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DUBINA = Integer.parseInt(((MenuItem)e.getSource()).getLabel());
+			}
+		});
+		meni.add(stavka);
+		meni.addSeparator();
+		
+		stavka = new MenuItem("3");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DUBINA = Integer.parseInt(((MenuItem)e.getSource()).getLabel());
+			}
+		});
+		meni.add(stavka);
+		meni.addSeparator();
+		
+		stavka = new MenuItem("4");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DUBINA = Integer.parseInt(((MenuItem)e.getSource()).getLabel());
+			}
+		});
+		meni.add(stavka);
+		meni.addSeparator();
+		
+		stavka = new MenuItem("5");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				DUBINA = Integer.parseInt(((MenuItem)e.getSource()).getLabel());
+			}
+		});
+		meni.add(stavka);
+		
+		meni = new Menu("Ucitavanje");
+		traka.add(meni);
+		
+		stavka = new MenuItem("Ucitaj iz fajla");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					igra.ucitajIzFajla();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		meni.add(stavka);
+		
+		/*stavka = new MenuItem("Nastavi");
+		stavka.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				igra.poteraj();
+			}
+		});
+		meni.add(stavka);*/
+	}
+	
 	public Santorini() {
 		super("Santorini");
+		racunara=0;
+		rezimKorakPoKorak=false;
 		setBounds(300, 300, 800, 500);
 		popuniProzor();
+		dodajMeni();
 		setVisible(true);
 
 		addWindowListener(new WindowAdapter() {
@@ -90,6 +244,8 @@ public class Santorini extends Frame {
 				dispose();
 			}
 		});
+		
+		igra = new Igra(tabla, prvi.igrac, drugi.igrac, stanje);
 	}
 
 	public static void main(String[] varg) {

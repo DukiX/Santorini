@@ -3,10 +3,10 @@ package etf.santorini.pd150258d;
 import java.util.Random;
 
 
-public class Racunar extends Igrac {
+public class RacunarAlfaBeta extends Igrac {
 
 	
-	public Racunar(String ozn, Tabla tbl) {
+	public RacunarAlfaBeta(String ozn, Tabla tbl) {
 		super(ozn, tbl);
 	}
 
@@ -26,9 +26,9 @@ public class Racunar extends Igrac {
 				figure[0].getOznaka() + ", Vis: " + figure[0].getTrenutnaVisina());
 		
 		upisiUFajl(koor.getRed(), koor.getKolona());
-		
-		writer.print(" ");
 
+		writer.print(" ");
+		
 		red = randomBr.nextInt(5);
 		kol = randomBr.nextInt(5);
 		koor = new Koordinate(red, kol);
@@ -48,7 +48,7 @@ public class Racunar extends Igrac {
 	@Override
 	public void prviDeoPoteza() throws InterruptedException, Greska {
 		
-		Igra.minimaxPrvi(tabla, Igra.pripremiFigure(), Santorini.DUBINA, 0, 1);
+		Igra.minimaxAlfaBeta(tabla, Igra.pripremiFigure(), Santorini.DUBINA, 0, 1,-100000,100000);
 		
 		izabranaFigura = dohvatiFiguru(Igra.staraPozicija);
 		

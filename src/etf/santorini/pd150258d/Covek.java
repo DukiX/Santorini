@@ -15,6 +15,10 @@ public class Covek extends Igrac {
 		figure[0] = new Figura(koor, oznaka + "F0");
 		tabla.postaviOznaku(koor.getRed(), koor.getKolona(),
 				figure[0].getOznaka() + ", Vis: " + figure[0].getTrenutnaVisina());
+		
+		upisiUFajl(koor.getRed(), koor.getKolona());
+		
+		writer.print(" ");
 
 		koor = tabla.uzmiPritisnuto();
 		while (!tabla.oznaka(koor.getRed(), koor.getKolona()).equals("0")) {
@@ -23,6 +27,9 @@ public class Covek extends Igrac {
 		figure[1] = new Figura(koor, oznaka + "F1");
 		tabla.postaviOznaku(koor.getRed(), koor.getKolona(),
 				figure[1].getOznaka() + ", Vis: " + figure[1].getTrenutnaVisina());
+		
+		upisiUFajl(koor.getRed(), koor.getKolona());
+		writer.println();
 	}
 
 	@Override
@@ -76,6 +83,11 @@ public class Covek extends Igrac {
 				.setTrenutnaVisina(Integer.parseInt(tabla.oznaka(novaPozicija.getRed(), novaPozicija.getKolona())));
 		tabla.postaviOznaku(novaPozicija.getRed(), novaPozicija.getKolona(),
 				izabranaFigura.getOznaka() + ", Vis: " + izabranaFigura.getTrenutnaVisina());
+		
+		upisiUFajl(izabranaFig.getRed(), izabranaFig.getKolona());
+		writer.print(" ");
+		upisiUFajl(novaPozicija.getRed(), novaPozicija.getKolona());
+		writer.print(" ");
 	}
 
 	@Override
@@ -91,6 +103,9 @@ public class Covek extends Igrac {
 			int novaVisina = staraVisina + 1;
 			tabla.postaviOznaku(izabranoPolje.getRed(), izabranoPolje.getKolona(), Integer.toString(novaVisina));
 		}
+		
+		upisiUFajl(izabranoPolje.getRed(), izabranoPolje.getKolona());
+		writer.println();
 	}
 
 }
