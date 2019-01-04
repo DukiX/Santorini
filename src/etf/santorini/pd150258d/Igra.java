@@ -12,7 +12,6 @@ public class Igra extends Thread {
 	private Label oznStanje;
 	public static Label metrika = new Label();
 	private Font font = new Font(null, Font.BOLD, 20);
-	
 
 	public Igra(Tabla tbl, Igrac prvi, Igrac drugi, Label sta) {
 		igraci[0] = prvi;
@@ -58,7 +57,7 @@ public class Igra extends Thread {
 		return f;
 	}
 
-	private static int statickaFunkcijaZadata(Tabla t, Figura[] moje, Figura[] tudje) throws Greska {
+	private static int statickaFunkcijaZadata(Tabla t, Figura[] moje, Figura[] tudje, boolean max) throws Greska {
 		int f;
 		int m = privremenoPomerenaFigura.getTrenutnaVisina();
 		int l;
@@ -78,7 +77,11 @@ public class Igra extends Thread {
 		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
 		l = l * razlika;
 		f = m + l;
-		return f;
+		//if (max) {
+			return f;
+		//} else {
+		//	return -f;
+		//}
 	}
 
 	public static int minimaxPrvi(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
@@ -95,25 +98,24 @@ public class Igra extends Thread {
 			donja = 0;
 			gornja = 2;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[0];
+			temp1[1] = trenFig[1];
+			temp2[0] = trenFig[2];
+			temp2[1] = trenFig[3];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
 			}
 
 		} else {
@@ -121,25 +123,24 @@ public class Igra extends Thread {
 			donja = 2;
 			gornja = 4;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[2];
+			temp1[1] = trenFig[3];
+			temp2[0] = trenFig[0];
+			temp2[1] = trenFig[1];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
 			}
 		}
 
@@ -223,16 +224,19 @@ public class Igra extends Thread {
 									1 - trenutniIgrac);
 
 							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
-								//System.out.println("1Najbolja:" + najboljaVrednost);
+								// System.out.println("1Najbolja:" +
+								// najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								//System.out.println("2Najbolja:" + najboljaVrednost);
+								// System.out.println("2Najbolja:" +
+								// najboljaVrednost);
 
 								if (trenutnaDubina == 0) {
 									staraPozicija = trenFig[f].getKoord();
 
 									odlukaPomeranje = novoPostavljeno;
-									//System.out.println(
-											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									// System.out.println(
+									// odlukaPomeranje.getRed() + " " +
+									// odlukaPomeranje.getKolona() + "\n");
 									odlukaGradnja = novoIzgrLok;
 								}
 							}
@@ -342,7 +346,7 @@ public class Igra extends Thread {
 
 		}
 		int kolona = Integer.parseInt(k);
-		return new Koordinate(red, kolona-1);
+		return new Koordinate(red, kolona - 1);
 	}
 
 	public void ucitajIzFajla() throws InterruptedException {
@@ -443,8 +447,7 @@ public class Igra extends Thread {
 			ucitaneFigureDrugog = false;
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
 	@Override
@@ -475,15 +478,16 @@ public class Igra extends Thread {
 					break;
 				oznStanje.setText("Gradnja: igrac " + tekIgrac);
 
-				/*if (Santorini.rezimKorakPoKorak) {
-					
-					stani();
-				}*/
+				/*
+				 * if (Santorini.rezimKorakPoKorak) {
+				 * 
+				 * stani(); }
+				 */
 
 				igraci[tekIgrac].drugiDeoPoteza();
-				
+
 				metrika.setText(Integer.toString(Igrac.minMaxVr));
-				
+
 				tekIgrac = 1 - tekIgrac;
 			}
 			oznStanje.setText("Pobednik je " + stanje);
@@ -501,9 +505,63 @@ public class Igra extends Thread {
 		interrupt();
 	}
 
+	public static boolean imaLiSlobodnih(Tabla tabla, Figura fig0, Figura fig1) throws NumberFormatException, Greska {
+		int mojaVisina0 = fig0.getTrenutnaVisina();
+		int mojaVisina1 = fig1.getTrenutnaVisina();
+		Koordinate k0 = fig0.getKoord();
+		Koordinate k1 = fig1.getKoord();
+
+		boolean nemaGde0 = true;
+		boolean nemaGde1 = true;
+
+		for (int i = k0.getRed() - 1; i <= k0.getRed() + 1; i++) {
+			for (int j = k0.getKolona() - 1; j <= k0.getKolona() + 1; j++) {
+				if (i < 0 || i > 4 || j < 0 || j > 4) {
+					continue;
+				}
+				if (i == k0.getRed() && j == k0.getKolona()) {
+					continue;
+				}
+				if (tabla.oznaka(i, j).equals("0") || tabla.oznaka(i, j).equals("1") || tabla.oznaka(i, j).equals("2")
+						|| tabla.oznaka(i, j).equals("3")) {
+					int visinaPolja = Integer.parseInt(tabla.oznaka(i, j));
+					if (visinaPolja <= mojaVisina0 + 1) {
+						nemaGde0 = false;
+					}
+				}
+			}
+		}
+
+		for (int i = k1.getRed() - 1; i <= k1.getRed() + 1; i++) {
+			for (int j = k1.getKolona() - 1; j <= k1.getKolona() + 1; j++) {
+				if (i < 0 || i > 4 || j < 0 || j > 4) {
+					continue;
+				}
+				if (i == k1.getRed() && j == k1.getKolona()) {
+					continue;
+				}
+				if (tabla.oznaka(i, j).equals("0") || tabla.oznaka(i, j).equals("1") || tabla.oznaka(i, j).equals("2")
+						|| tabla.oznaka(i, j).equals("3")) {
+					int visinaPolja = Integer.parseInt(tabla.oznaka(i, j));
+					if (visinaPolja <= mojaVisina1 + 1) {
+						nemaGde1 = false;
+					}
+				}
+			}
+		}
+
+		if (nemaGde0 && nemaGde1) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public static int minimaxAlfaBeta(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
 			int trenutniIgrac, int alfa, int beta) throws Greska {
 		int najboljaVrednost, trenutnaVrednost;
+
+		//System.out.println("evo " + tekIgrac + " evo");
 
 		Koordinate novoPostavljeno;
 		Koordinate novoIzgrLok;
@@ -518,25 +576,24 @@ public class Igra extends Thread {
 			donja = 0;
 			gornja = 2;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[0];
+			temp1[1] = trenFig[1];
+			temp2[0] = trenFig[2];
+			temp2[1] = trenFig[3];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
 			}
 
 		} else {
@@ -544,25 +601,24 @@ public class Igra extends Thread {
 			donja = 2;
 			gornja = 4;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[2];
+			temp1[1] = trenFig[3];
+			temp2[0] = trenFig[0];
+			temp2[1] = trenFig[1];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
-				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2);
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
 			}
 		}
 
@@ -614,6 +670,8 @@ public class Igra extends Thread {
 					novoPostavljeno = figureLok[f].getKoord();
 					privremenoPomerenaFigura = figureLok[f];
 
+					//System.out.println(" i" + i + " j" + j + " " + trenFig[f].oznaka + " " + tekIgrac + "\n");
+
 					for (int m = figureLok[f].getKoord().getRed() - 1; m <= figureLok[f].getKoord().getRed() + 1; m++) {
 						for (int n = figureLok[f].getKoord().getKolona() - 1; n <= figureLok[f].getKoord().getKolona()
 								+ 1; n++) {
@@ -642,13 +700,20 @@ public class Igra extends Thread {
 							novoIzgradjeno = novoStanje.uzmiKoordinate(m, n);
 							novoIzgrLok = novoIzgradjeno;
 
+							//System.out.println(" m" + m + " n" + n + " " + trenFig[f].oznaka + "\n");
+
 							trenutnaVrednost = minimaxAlfaBeta(novoStanje, figureLok, maxDubina, trenutnaDubina + 1,
 									1 - trenutniIgrac, alfaLok, betaLok);
 
+							//System.out
+									//.println("trenutna vrednos" + trenutnaVrednost + "dubina" + trenutnaDubina + "\n");
+
 							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
-								//System.out.println("1Najbolja:" + najboljaVrednost);
+								// System.out.println("1Najbolja:" +
+								// najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								//System.out.println("2Najbolja:" + najboljaVrednost);
+								// System.out.println("2Najbolja:" +
+								// najboljaVrednost);
 
 								if (najboljaVrednost >= betaLok) {
 									return najboljaVrednost;
@@ -659,9 +724,13 @@ public class Igra extends Thread {
 								if (trenutnaDubina == 0) {
 									staraPozicija = trenFig[f].getKoord();
 
+									//System.out.println(staraPozicija.getRed() + " " + staraPozicija.getKolona()
+											//+ trenFig[f].oznaka + "\n");
+
 									odlukaPomeranje = novoPostavljeno;
-									//System.out.println(
-											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									// System.out.println(
+									// odlukaPomeranje.getRed() + " " +
+									// odlukaPomeranje.getKolona() + "\n");
 									odlukaGradnja = novoIzgrLok;
 								}
 							}
@@ -685,7 +754,7 @@ public class Igra extends Thread {
 		}
 		return najboljaVrednost;
 	}
-	
+
 	private static int statickaFunkcijaNapredna(Tabla t, Figura[] moje, Figura[] tudje) throws Greska {
 		int f;
 		int m = privremenoPomerenaFigura.getTrenutnaVisina();
@@ -708,7 +777,7 @@ public class Igra extends Thread {
 		f = m + l;
 		return f;
 	}
-	
+
 	public static int minimaxNapredni(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
 			int trenutniIgrac, int alfa, int beta) throws Greska {
 		int najboljaVrednost, trenutnaVrednost;
@@ -726,24 +795,23 @@ public class Igra extends Thread {
 			donja = 0;
 			gornja = 2;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[0];
+			temp1[1] = trenFig[1];
+			temp2[0] = trenFig[2];
+			temp2[1] = trenFig[3];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, true);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
 				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[0];
-				temp1[1] = trenFig[1];
-				temp2[0] = trenFig[2];
-				temp2[1] = trenFig[3];
 				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
 			}
 
@@ -752,24 +820,23 @@ public class Igra extends Thread {
 			donja = 2;
 			gornja = 4;
 
+			Figura[] temp1 = new Figura[2];
+			Figura[] temp2 = new Figura[2];
+			temp1[0] = trenFig[2];
+			temp1[1] = trenFig[3];
+			temp2[0] = trenFig[0];
+			temp2[1] = trenFig[1];
+
+			if (!imaLiSlobodnih(trenutnoStanje, temp1[0], temp1[1])) {
+				return statickaFunkcijaZadata(trenutnoStanje, temp1, temp2, false);
+			}
+
 			if (trenutnaDubina == maxDubina) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
 				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				Figura[] temp1 = new Figura[2];
-				Figura[] temp2 = new Figura[2];
-				temp1[0] = trenFig[2];
-				temp1[1] = trenFig[3];
-				temp2[0] = trenFig[0];
-				temp2[1] = trenFig[1];
 				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2);
 			}
 		}
@@ -854,9 +921,11 @@ public class Igra extends Thread {
 									1 - trenutniIgrac, alfaLok, betaLok);
 
 							if (trenutniIgrac == 1 && trenutnaVrednost > najboljaVrednost) {
-								//System.out.println("1Najbolja:" + najboljaVrednost);
+								// System.out.println("1Najbolja:" +
+								// najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								//System.out.println("2Najbolja:" + najboljaVrednost);
+								// System.out.println("2Najbolja:" +
+								// najboljaVrednost);
 
 								if (najboljaVrednost >= betaLok) {
 									return najboljaVrednost;
@@ -868,8 +937,9 @@ public class Igra extends Thread {
 									staraPozicija = trenFig[f].getKoord();
 
 									odlukaPomeranje = novoPostavljeno;
-									//System.out.println(
-											//odlukaPomeranje.getRed() + " " + odlukaPomeranje.getKolona() + "\n");
+									// System.out.println(
+									// odlukaPomeranje.getRed() + " " +
+									// odlukaPomeranje.getKolona() + "\n");
 									odlukaGradnja = novoIzgrLok;
 								}
 							}
