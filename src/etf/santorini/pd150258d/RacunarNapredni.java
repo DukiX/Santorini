@@ -47,7 +47,7 @@ public class RacunarNapredni extends Igrac {
 	public void prviDeoPoteza() throws InterruptedException, Greska {
 
 		minMaxVr = Igra.minimaxNapredni(tabla, Igra.pripremiFigure(), Santorini.DUBINA, 0, 1, -100000, 100000);
-
+		
 		izabranaFigura = dohvatiFiguru(Igra.staraPozicija);
 
 		tabla.postaviOznaku(Igra.staraPozicija.getRed(), Igra.staraPozicija.getKolona(),

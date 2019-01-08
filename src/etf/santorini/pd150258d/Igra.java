@@ -77,11 +77,13 @@ public class Igra extends Thread {
 		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
 		l = l * razlika;
 		f = m + l;
-		// if (max) {
+		
+		if (max) {
+			f = -f;
+		}
+		
 		return f;
-		// } else {
-		// return -f;
-		// }
+		
 	}
 
 	public static int minimaxPrvi(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
@@ -762,6 +764,7 @@ public class Igra extends Thread {
 	private static int statickaFunkcijaNapredna(Tabla t, Figura[] moje, Figura[] tudje, boolean max) throws Greska {
 		int f;
 		int m = privremenoPomerenaFigura.getTrenutnaVisina();
+		//System.out.println(m);
 		int l;
 		if (t.oznaka(novoIzgradjeno.getRed(), novoIzgradjeno.getKolona()).equals("K")) {
 			l = 3;
@@ -779,11 +782,16 @@ public class Igra extends Thread {
 		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
 		l = l * razlika;
 		f = m + l;
-		if (max) {
-			return f;
-		} else {
-			return -f;
+		
+		if(privremenoPomerenaFigura.getTrenutnaVisina() == 3){
+			f+=100;
 		}
+
+		if (max) {
+			f = -f;
+		}
+		 //System.out.println(f);
+		return f;
 	}
 
 	public static int minimaxNapredni(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
@@ -815,12 +823,12 @@ public class Igra extends Thread {
 			}
 
 			if (trenutnaDubina == maxDubina) {
-				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2,true);
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2, true);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2,true);
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2, true);
 			}
 
 		} else {
@@ -840,12 +848,12 @@ public class Igra extends Thread {
 			}
 
 			if (trenutnaDubina == maxDubina) {
-				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2,false);
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2, false);
 			}
 
 			if (trenFig[0].getTrenutnaVisina() == 3 || trenFig[1].getTrenutnaVisina() == 3
 					|| trenFig[2].getTrenutnaVisina() == 3 || trenFig[3].getTrenutnaVisina() == 3) {
-				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2,false);
+				return statickaFunkcijaNapredna(trenutnoStanje, temp1, temp2, false);
 			}
 		}
 
@@ -932,8 +940,7 @@ public class Igra extends Thread {
 								// System.out.println("1Najbolja:" +
 								// najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								// System.out.println("2Najbolja:" +
-								// najboljaVrednost);
+								//System.out.println("Najbolja:" + najboljaVrednost);
 
 								if (najboljaVrednost >= betaLok) {
 									return najboljaVrednost;
@@ -953,6 +960,8 @@ public class Igra extends Thread {
 							}
 							if (trenutniIgrac == 0 && trenutnaVrednost < najboljaVrednost) {
 								najboljaVrednost = trenutnaVrednost;
+
+								//System.out.println("Najbolja:" + najboljaVrednost);
 
 								if (najboljaVrednost <= alfaLok) {
 									return najboljaVrednost;

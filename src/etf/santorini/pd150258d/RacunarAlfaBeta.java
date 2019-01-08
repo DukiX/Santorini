@@ -2,7 +2,6 @@ package etf.santorini.pd150258d;
 
 import java.util.Random;
 
-import javax.xml.stream.util.StreamReaderDelegate;
 
 public class RacunarAlfaBeta extends Igrac {
 
@@ -52,11 +51,11 @@ public class RacunarAlfaBeta extends Igrac {
 
 		izabranaFigura = dohvatiFiguru(Igra.staraPozicija);
 
-		if(izabranaFigura == null){
+		/*if(izabranaFigura == null){
 			System.out.println("tuzno");
 			System.out.println(Igra.staraPozicija.getRed()+" a "+Igra.staraPozicija.getKolona());
 		}
-		
+		*/
 		tabla.postaviOznaku(Igra.staraPozicija.getRed(), Igra.staraPozicija.getKolona(),
 				Integer.toString(izabranaFigura.getTrenutnaVisina()));
 		izabranaFigura.setKoord(Igra.odlukaPomeranje);
