@@ -74,16 +74,16 @@ public class Igra extends Thread {
 				+ Math.abs(tudje[0].getKoord().getKolona() - novoIzgradjeno.getKolona())
 				+ Math.abs(tudje[1].getKoord().getRed() - novoIzgradjeno.getRed())
 				+ Math.abs(tudje[1].getKoord().getKolona() - novoIzgradjeno.getKolona());
-		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
+		int razlika = rastojanjeTudjih - rastojanjeMojih;
 		l = l * razlika;
 		f = m + l;
-		
+
 		if (max) {
 			f = -f;
 		}
-		
+
 		return f;
-		
+
 	}
 
 	public static int minimaxPrvi(Tabla trenutnoStanje, Figura[] trenFig, int maxDubina, int trenutnaDubina,
@@ -764,13 +764,35 @@ public class Igra extends Thread {
 	private static int statickaFunkcijaNapredna(Tabla t, Figura[] moje, Figura[] tudje, boolean max) throws Greska {
 		int f;
 		int m = privremenoPomerenaFigura.getTrenutnaVisina();
-		//System.out.println(m);
+		// System.out.println(m);
 		int l;
 		if (t.oznaka(novoIzgradjeno.getRed(), novoIzgradjeno.getKolona()).equals("K")) {
 			l = 3;
 		} else {
 			l = Integer.parseInt(t.oznaka(novoIzgradjeno.getRed(), novoIzgradjeno.getKolona())) - 1;
 		}
+
+		//ako se zaglavio
+		if (!imaLiSlobodnih(t, moje[0], moje[1])) {
+			if (max) {
+				return -250;
+			} else {
+				return 250;
+			}
+		}
+
+		//ne gradi kupolu ako niko nije blizu
+		if (l == 3 && Math.abs(novoIzgradjeno.getRed() - tudje[0].getKoord().getRed()) > 1
+				&& Math.abs(novoIzgradjeno.getKolona() - tudje[0].getKoord().getKolona()) > 1
+				&& Math.abs(novoIzgradjeno.getRed() - tudje[1].getKoord().getRed()) > 1
+				&& Math.abs(novoIzgradjeno.getKolona() - tudje[1].getKoord().getKolona()) > 1) {
+			if (max) {
+				return 300;
+			} else {
+				return -300;
+			}
+		}
+
 		int rastojanjeMojih = Math.abs(moje[0].getKoord().getRed() - novoIzgradjeno.getRed())
 				+ Math.abs(moje[0].getKoord().getKolona() - novoIzgradjeno.getKolona())
 				+ Math.abs(moje[1].getKoord().getRed() - novoIzgradjeno.getRed())
@@ -779,18 +801,39 @@ public class Igra extends Thread {
 				+ Math.abs(tudje[0].getKoord().getKolona() - novoIzgradjeno.getKolona())
 				+ Math.abs(tudje[1].getKoord().getRed() - novoIzgradjeno.getRed())
 				+ Math.abs(tudje[1].getKoord().getKolona() - novoIzgradjeno.getKolona());
-		int razlika = Math.abs(rastojanjeMojih - rastojanjeTudjih);
+		int razlika = rastojanjeTudjih - rastojanjeMojih;
 		l = l * razlika;
 		f = m + l;
-		
-		if(privremenoPomerenaFigura.getTrenutnaVisina() == 3){
-			f+=100;
+
+		//ako se popeo na vrh
+		if (privremenoPomerenaFigura.getTrenutnaVisina() == 3 && max) {
+			return -200;
 		}
+
+		if (privremenoPomerenaFigura.getTrenutnaVisina() == 3 && !max) {
+			return 200;
+		}
+		
+		//ako je necija figura odvojena od ostalih
+		/*if ((Math.abs(tudje[0].getKoord().getRed() - moje[0].getKoord().getRed()) > 2
+				&& Math.abs(tudje[0].getKoord().getKolona() - moje[0].getKoord().getKolona()) > 2
+				&& Math.abs(tudje[0].getKoord().getRed() - moje[1].getKoord().getRed()) > 2
+				&& Math.abs(tudje[0].getKoord().getKolona() - moje[1].getKoord().getKolona()) > 2)
+				|| (Math.abs(tudje[1].getKoord().getRed() - moje[0].getKoord().getRed()) > 2
+						&& Math.abs(tudje[1].getKoord().getKolona() - moje[0].getKoord().getKolona()) > 2
+						&& Math.abs(tudje[1].getKoord().getRed() - moje[1].getKoord().getRed()) > 2
+						&& Math.abs(tudje[1].getKoord().getKolona() - moje[1].getKoord().getKolona()) > 2)) {
+			if(max){
+				return 50;
+			}else{
+				return -50;
+			}
+		}*/
 
 		if (max) {
 			f = -f;
 		}
-		 //System.out.println(f);
+		// System.out.println(f);
 		return f;
 	}
 
@@ -940,7 +983,8 @@ public class Igra extends Thread {
 								// System.out.println("1Najbolja:" +
 								// najboljaVrednost);
 								najboljaVrednost = trenutnaVrednost;
-								//System.out.println("Najbolja:" + najboljaVrednost);
+								// System.out.println("Najbolja:" +
+								// najboljaVrednost);
 
 								if (najboljaVrednost >= betaLok) {
 									return najboljaVrednost;
@@ -961,7 +1005,8 @@ public class Igra extends Thread {
 							if (trenutniIgrac == 0 && trenutnaVrednost < najboljaVrednost) {
 								najboljaVrednost = trenutnaVrednost;
 
-								//System.out.println("Najbolja:" + najboljaVrednost);
+								// System.out.println("Najbolja:" +
+								// najboljaVrednost);
 
 								if (najboljaVrednost <= alfaLok) {
 									return najboljaVrednost;
